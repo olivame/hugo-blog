@@ -131,9 +131,9 @@
 <main class="main">
 
 <div style="text-align:center; margin-top: 40px; margin-bottom: 20px;">
-    <h1>Hi，我是 Yuzhi Deng 👋</h1>
+    <h1>我是 Yuzhi Deng </h1>
     <p style="font-size:18px; opacity:0.85;">
-        欢迎来到我的个人主页。我喜欢 AI、技术研究和效率工具。
+        欢迎来到我的个人主页。
     </p>
 </div>
 
@@ -141,31 +141,35 @@
 
 <section class="post-list" style="max-width: 800px; margin: 0 auto;">
     
-    <article class="post-entry" style="margin-bottom: 28px;">
-        <h2 style="margin-bottom: 6px;">
-            <a href="https://blog.olivame.xyz/posts/test-post/">测试文章</a>
-        </h2>
-        <time style="font-size:14px; opacity:0.6; display:block; margin-bottom:4px;">
-            December 5, 2025
-        </time>
-        <p style="opacity:0.8; margin:0;">
-            <p>这是一个测试文章。</p>
-        </p>
-    </article>
-    
-    <article class="post-entry" style="margin-bottom: 28px;">
-        <h2 style="margin-bottom: 6px;">
-            <a href="https://blog.olivame.xyz/posts/hello-world/">Hello World</a>
-        </h2>
-        <time style="font-size:14px; opacity:0.6; display:block; margin-bottom:4px;">
-            December 4, 2025
-        </time>
-        <p style="opacity:0.8; margin:0;">
-            
-        </p>
+    <article class="post-card" style="
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #ddd;
+        margin-bottom: 20px;
+        background: white;
+        transition: box-shadow 0.3s ease, transform 0.2s ease;
+    ">
+        <a href="https://blog.olivame.xyz/posts/setup-hugo-blog/" style="text-decoration:none; color:inherit;">
+            <h2 style="margin-bottom: 8px;">Hugo 自动部署系统（Webhook &#43; Caddy &#43; GitHub）</h2>
+
+            <time style="font-size:14px; opacity:0.6;">
+                December 5, 2025 17:01
+            </time>
+
+            <p style="opacity:0.8; margin-top:10px;">
+                <p>本文记录如何构建一个 <strong>自动从 GitHub 拉取并重新部署 Hugo 博客</strong> 的完整系统。</p>
+            </p>
+        </a>
     </article>
     
 </section>
+
+<style>
+.post-card:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    transform: translateY(-3px);
+}
+</style>
 
 
     </main>

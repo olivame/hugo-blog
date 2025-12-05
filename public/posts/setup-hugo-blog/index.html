@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Hugo 自动部署系统（Webhook &#43; Caddy &#43; GitHub） | Yuzhi Deng&#39;s homepage</title>
+<meta name="keywords" content="Hugo, 部署, Caddy, Webhook">
+<meta name="description" content="使用 Webhook、Caddy 和 GitHub 搭建自动化部署 Hugo 博客的完整流程。">
+<meta name="author" content="">
+<link rel="canonical" href="https://blog.olivame.xyz/posts/setup-hugo-blog/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.b4550698afc65284dc42db26a605e71d3cb8c078c90585c9337bfbaeb8050860.css" integrity="sha256-tFUGmK/GUoTcQtsmpgXnHTy4wHjJBYXJM3v7rrgFCGA=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://blog.olivame.xyz/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://blog.olivame.xyz/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://blog.olivame.xyz/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://blog.olivame.xyz/apple-touch-icon.png">
+<link rel="mask-icon" href="https://blog.olivame.xyz/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://blog.olivame.xyz/posts/setup-hugo-blog/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            .list::-webkit-scrollbar-thumb {
+                border-color: var(--code-bg);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://blog.olivame.xyz/posts/setup-hugo-blog/">
+  <meta property="og:site_name" content="Yuzhi Deng&#39;s homepage">
+  <meta property="og:title" content="Hugo 自动部署系统（Webhook &#43; Caddy &#43; GitHub）">
+  <meta property="og:description" content="使用 Webhook、Caddy 和 GitHub 搭建自动化部署 Hugo 博客的完整流程。">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-12-05T17:01:00+08:00">
+    <meta property="article:modified_time" content="2025-12-05T17:01:00+08:00">
+    <meta property="article:tag" content="Hugo">
+    <meta property="article:tag" content="部署">
+    <meta property="article:tag" content="Caddy">
+    <meta property="article:tag" content="Webhook">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hugo 自动部署系统（Webhook &#43; Caddy &#43; GitHub）">
+<meta name="twitter:description" content="使用 Webhook、Caddy 和 GitHub 搭建自动化部署 Hugo 博客的完整流程。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://blog.olivame.xyz/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Hugo 自动部署系统（Webhook + Caddy + GitHub）",
+      "item": "https://blog.olivame.xyz/posts/setup-hugo-blog/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Hugo 自动部署系统（Webhook + Caddy + GitHub）",
+  "name": "Hugo 自动部署系统（Webhook \u002b Caddy \u002b GitHub）",
+  "description": "使用 Webhook、Caddy 和 GitHub 搭建自动化部署 Hugo 博客的完整流程。",
+  "keywords": [
+    "Hugo", "部署", "Caddy", "Webhook"
+  ],
+  "articleBody": "本文记录如何构建一个 自动从 GitHub 拉取并重新部署 Hugo 博客 的完整系统。\n系统结构 GitHub → Webhook → 服务器监听端口 9000 → 执行 deploy.sh → Hugo 重新构建 → Caddy 热重载 → 网站更新 1. 服务器目录结构 /home/ubuntu/ ├── hugo-site/ # Hugo 博客目录（git clone） ├── deploy.sh # 自动部署脚本 ├── hooks.json # Webhook 配置 ├── webhook.log # 日志（可选） 2. deploy.sh（自动部署脚本） #!/bin/bash echo \"\u003e\u003e\u003e Pulling latest GitHub changes...\" git -C /home/ubuntu/hugo-site reset --hard git -C /home/ubuntu/hugo-site pull origin main echo \"\u003e\u003e\u003e Building Hugo site...\" cd /home/ubuntu/hugo-site /usr/bin/hugo echo \"\u003e\u003e\u003e Reloading Caddy...\" sudo systemctl reload caddy echo \"\u003e\u003e\u003e Deploy completed!\" 3. Webhook 配置文件 hooks.json [ { \"id\": \"deploy-blog\", \"execute-command\": \"/home/ubuntu/deploy.sh\", \"command-working-directory\": \"/home/ubuntu\", \"response-message\": \"Deploy started\" } ] 4. Webhook systemd 服务 路径：/etc/systemd/system/webhook.service\n[Unit] Description=Webhook Listener for Hugo Auto Deployment After=network.target [Service] ExecStart=/usr/bin/webhook -hooks /home/ubuntu/hooks.json -port 9000 -verbose Restart=always User=ubuntu WorkingDirectory=/home/ubuntu [Install] WantedBy=multi-user.target 启动：\nsudo systemctl daemon-reload sudo systemctl enable --now webhook 5. GitHub Webhook 设置 Settings → Webhooks：\nPayload URL：http://你的IP:9000/hooks/deploy-blog Content-Type：application/json 触发：Just the push event 必须保证 9000 端口外网可访问。\n6. Caddy 配置（Hugo 站点） 路径：/etc/caddy/Caddyfile\nblog.olivame.xyz { root * /home/ubuntu/hugo-site/public file_server try_files {path} {path}/ /index.html } 重载：\nsudo systemctl reload caddy 系统完成 现在只要：\npush 到 GitHub → 网站自动同步\n博客文章、主题修改、首页内容更新都会自动部署。\n",
+  "wordCount" : "184",
+  "inLanguage": "en",
+  "datePublished": "2025-12-05T17:01:00+08:00",
+  "dateModified": "2025-12-05T17:01:00+08:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://blog.olivame.xyz/posts/setup-hugo-blog/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Yuzhi Deng's homepage",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://blog.olivame.xyz/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://blog.olivame.xyz/" accesskey="h" title="Yuzhi Deng&#39;s homepage (Alt + H)">Yuzhi Deng&#39;s homepage</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <div class="breadcrumbs"><a href="https://blog.olivame.xyz/">Home</a>&nbsp;»&nbsp;<a href="https://blog.olivame.xyz/posts/">Posts</a></div>
+    <h1 class="post-title entry-hint-parent">
+      Hugo 自动部署系统（Webhook &#43; Caddy &#43; GitHub）
+    </h1>
+    <div class="post-description">
+      使用 Webhook、Caddy 和 GitHub 搭建自动化部署 Hugo 博客的完整流程。
+    </div>
+    <div class="post-meta"><span title='2025-12-05 17:01:00 +0800 +0800'>December 5, 2025</span>&nbsp;·&nbsp;<span>1 min</span>
+
+</div>
+  </header> 
+  <div class="post-content"><p>本文记录如何构建一个 <strong>自动从 GitHub 拉取并重新部署 Hugo 博客</strong> 的完整系统。</p>
+<hr>
+<h2 id="系统结构">系统结构<a hidden class="anchor" aria-hidden="true" href="#系统结构">#</a></h2>
+<pre tabindex="0"><code>GitHub → Webhook → 服务器监听端口 9000 → 执行 deploy.sh →
+Hugo 重新构建 → Caddy 热重载 → 网站更新
+</code></pre><hr>
+<h2 id="1-服务器目录结构">1. 服务器目录结构<a hidden class="anchor" aria-hidden="true" href="#1-服务器目录结构">#</a></h2>
+<pre tabindex="0"><code>/home/ubuntu/
+ ├── hugo-site/        # Hugo 博客目录（git clone）
+ ├── deploy.sh         # 自动部署脚本
+ ├── hooks.json        # Webhook 配置
+ ├── webhook.log       # 日志（可选）
+</code></pre><hr>
+<h2 id="2-deploysh自动部署脚本">2. deploy.sh（自动部署脚本）<a hidden class="anchor" aria-hidden="true" href="#2-deploysh自动部署脚本">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>echo <span style="color:#e6db74">&#34;&gt;&gt;&gt; Pulling latest GitHub changes...&#34;</span>
+</span></span><span style="display:flex;"><span>git -C /home/ubuntu/hugo-site reset --hard
+</span></span><span style="display:flex;"><span>git -C /home/ubuntu/hugo-site pull origin main
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;&gt;&gt;&gt; Building Hugo site...&#34;</span>
+</span></span><span style="display:flex;"><span>cd /home/ubuntu/hugo-site
+</span></span><span style="display:flex;"><span>/usr/bin/hugo
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;&gt;&gt;&gt; Reloading Caddy...&#34;</span>
+</span></span><span style="display:flex;"><span>sudo systemctl reload caddy
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#34;&gt;&gt;&gt; Deploy completed!&#34;</span>
+</span></span></code></pre></div><hr>
+<h2 id="3-webhook-配置文件-hooksjson">3. Webhook 配置文件 hooks.json<a hidden class="anchor" aria-hidden="true" href="#3-webhook-配置文件-hooksjson">#</a></h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>[
+</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;id&#34;</span>: <span style="color:#e6db74">&#34;deploy-blog&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;execute-command&#34;</span>: <span style="color:#e6db74">&#34;/home/ubuntu/deploy.sh&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;command-working-directory&#34;</span>: <span style="color:#e6db74">&#34;/home/ubuntu&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;response-message&#34;</span>: <span style="color:#e6db74">&#34;Deploy started&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>]
+</span></span></code></pre></div><hr>
+<h2 id="4-webhook-systemd-服务">4. Webhook systemd 服务<a hidden class="anchor" aria-hidden="true" href="#4-webhook-systemd-服务">#</a></h2>
+<p>路径：<code>/etc/systemd/system/webhook.service</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-ini" data-lang="ini"><span style="display:flex;"><span><span style="color:#66d9ef">[Unit]</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Description</span><span style="color:#f92672">=</span><span style="color:#e6db74">Webhook Listener for Hugo Auto Deployment</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">After</span><span style="color:#f92672">=</span><span style="color:#e6db74">network.target</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">[Service]</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">ExecStart</span><span style="color:#f92672">=</span><span style="color:#e6db74">/usr/bin/webhook -hooks /home/ubuntu/hooks.json -port 9000 -verbose</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">Restart</span><span style="color:#f92672">=</span><span style="color:#e6db74">always</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">User</span><span style="color:#f92672">=</span><span style="color:#e6db74">ubuntu</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">WorkingDirectory</span><span style="color:#f92672">=</span><span style="color:#e6db74">/home/ubuntu</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">[Install]</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">WantedBy</span><span style="color:#f92672">=</span><span style="color:#e6db74">multi-user.target</span>
+</span></span></code></pre></div><p>启动：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo systemctl daemon-reload
+</span></span><span style="display:flex;"><span>sudo systemctl enable --now webhook
+</span></span></code></pre></div><hr>
+<h2 id="5-github-webhook-设置">5. GitHub Webhook 设置<a hidden class="anchor" aria-hidden="true" href="#5-github-webhook-设置">#</a></h2>
+<p>Settings → Webhooks：</p>
+<ul>
+<li><strong>Payload URL</strong>：<code>http://你的IP:9000/hooks/deploy-blog</code></li>
+<li>Content-Type：<code>application/json</code></li>
+<li>触发：Just the push event</li>
+</ul>
+<p>必须保证 9000 端口外网可访问。</p>
+<hr>
+<h2 id="6-caddy-配置hugo-站点">6. Caddy 配置（Hugo 站点）<a hidden class="anchor" aria-hidden="true" href="#6-caddy-配置hugo-站点">#</a></h2>
+<p>路径：<code>/etc/caddy/Caddyfile</code></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-caddy" data-lang="caddy"><span style="display:flex;"><span>blog.olivame.xyz {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">root</span> <span style="color:#a6e22e">*</span> <span style="color:#e6db74">/home/ubuntu/hugo-site/public</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">file_server</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">try_files</span> <span style="color:#ae81ff">{path}</span> <span style="color:#ae81ff">{path}</span><span style="color:#e6db74">/</span> <span style="color:#e6db74">/index.html</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>重载：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sudo systemctl reload caddy
+</span></span></code></pre></div><hr>
+<h2 id="系统完成">系统完成<a hidden class="anchor" aria-hidden="true" href="#系统完成">#</a></h2>
+<p>现在只要：</p>
+<blockquote>
+<p>push 到 GitHub → 网站自动同步</p>
+</blockquote>
+<p>博客文章、主题修改、首页内容更新都会自动部署。</p>
+<hr>
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://blog.olivame.xyz/tags/hugo/">Hugo</a></li>
+      <li><a href="https://blog.olivame.xyz/tags/%E9%83%A8%E7%BD%B2/">部署</a></li>
+      <li><a href="https://blog.olivame.xyz/tags/caddy/">Caddy</a></li>
+      <li><a href="https://blog.olivame.xyz/tags/webhook/">Webhook</a></li>
+    </ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://blog.olivame.xyz/">Yuzhi Deng&#39;s homepage</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

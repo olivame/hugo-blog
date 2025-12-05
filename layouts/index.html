@@ -11,18 +11,34 @@
 
 <section class="post-list" style="max-width: 800px; margin: 0 auto;">
     {{ range .Site.RegularPages.ByDate.Reverse }}
-    <article class="post-entry" style="margin-bottom: 28px;">
-        <h2 style="margin-bottom: 6px;">
-            <a href="{{ .Permalink }}">{{ .Title }}</a>
-        </h2>
-        <time style="font-size:14px; opacity:0.6; display:block; margin-bottom:4px;">
-            {{ .Date.Format "January 2, 2006" }}
-        </time>
-        <p style="opacity:0.8; margin:0;">
-            {{ .Summary }}
-        </p>
+    <article class="post-card" style="
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #ddd;
+        margin-bottom: 20px;
+        background: white;
+        transition: box-shadow 0.3s ease, transform 0.2s ease;
+    ">
+        <a href="{{ .Permalink }}" style="text-decoration:none; color:inherit;">
+            <h2 style="margin-bottom: 8px;">{{ .Title }}</h2>
+
+            <time style="font-size:14px; opacity:0.6;">
+                {{ .Date.Format "January 2, 2006" }}
+            </time>
+
+            <p style="opacity:0.8; margin-top:10px;">
+                {{ .Summary }}
+            </p>
+        </a>
     </article>
     {{ end }}
 </section>
+
+<style>
+.post-card:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    transform: translateY(-3px);
+}
+</style>
 
 {{ end }}

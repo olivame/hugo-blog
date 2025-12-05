@@ -17,14 +17,26 @@ body {
     max-width: 1000px !important;
 }
 
+/* 让标题区域更宽 */
 .single-title {
-    max-width: 100% !important;
+    max-width: 1200px !important;     /* 标题最大宽度，自行调整 */
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
+/* 标题自身不限制宽度 */
 .post-title {
     max-width: 100% !important;
     word-break: normal !important;
     overflow-wrap: break-word !important;
+}
+
+/* 正文保持正常宽度（可选） */
+.post-single .post-content {
+    max-width: 780px;         /* PaperMod 默认 720px，可调 */
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .post-entry:hover {

@@ -1,23 +1,44 @@
 {{- $scratch := newScratch }}
 
+{{/* --------- 日期 --------- */}}
 {{- if not .Date.IsZero -}}
-{{- $scratch.Add "meta" (slice (printf "<span title='%s'>%s</span>" (.Date) (.Date | time.Format (default "2006-01-02 15:04" site.Params.DateFormat)))) }}
+  {{- $dateFormat := (default "2006-01-02 15:04" site.Params.DateFormat) -}}
+  {{- $dateHTML := printf "<span>%s</span>" (.Date | time.Format $dateFormat) -}}
+  {{- $scratch.Add "meta_left" (slice $dateHTML) -}}
 {{- end }}
 
-{{- if (.Param "ShowReadingTime") -}}
-{{- $scratch.Add "meta" (slice (printf "<span>%s</span>" (i18n "read_time" .ReadingTime | default (printf "%d min" .ReadingTime)))) }}
-{{- end }}
-
-{{- if (.Param "ShowWordCount") -}}
-{{- $scratch.Add "meta" (slice (printf "<span>%s</span>" (i18n "words" .WordCount | default (printf "%d words" .WordCount)))) }}
-{{- end }}
-
+{{/* --------- 作者（如果启用） --------- */}}
 {{- if not (.Param "hideAuthor") -}}
-{{- with (partial "author.html" .) }}
-{{- $scratch.Add "meta" (slice (printf "<span>%s</span>" .)) }}
-{{- end }}
+  {{- with (partial "author.html" .) }}
+    {{- $scratch.Add "meta_left" (slice (printf "<span>%s</span>" .)) }}
+  {{- end }}
 {{- end }}
 
-{{- with ($scratch.Get "meta") }}
-{{- delimit . "&nbsp;·&nbsp;" | safeHTML -}}
-{{- end -}}
+{{/* --------- 阅读时间 --------- */}}
+{{- if (.Param "ShowReadingTime") -}}
+  {{- $reading := printf "%d min" .ReadingTime -}}
+  {{- $scratch.Add "meta_right" (slice (printf "<span>%s</span>" $reading)) }}
+{{- end }}
+
+{{/* --------- 字数（如果启用） --------- */}}
+{{- if (.Param "ShowWordCount") -}}
+  {{- $words := printf "%d words" .WordCount -}}
+  {{- $scratch.Add "meta_right" (slice (printf "<span>%s</span>" $words)) }}
+{{- end }}
+
+{{/* --------- 布局输出 --------- */}}
+<div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+  
+  <div style="display:flex; gap:10px;">
+    {{- with ($scratch.Get "meta_left") -}}
+      {{- delimit . " · " | safeHTML -}}
+    {{- end -}}
+  </div>
+
+  <div style="opacity:0.7;">
+    {{- with ($scratch.Get "meta_right") -}}
+      {{- delimit . " · " | safeHTML -}}
+    {{- end -}}
+  </div>
+
+</div>

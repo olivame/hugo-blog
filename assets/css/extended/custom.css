@@ -13,12 +13,18 @@ body {
   transition: all 0.25s ease;
 }
 
-/* === 让 PaperMod 标题自适应宽度 === */
+.main {
+    max-width: 1000px !important;
+}
+
+.single-title {
+    max-width: 100% !important;
+}
+
 .post-title {
-    max-width: 100% !important;   /* 使用整个内容区宽度 */
-    word-break: normal;           /* 避免中文或英文被硬拆 */
-    overflow-wrap: break-word;    /* 只在必要时换行 */
-    line-height: 1.25;            /* 更好看（可选） */
+    max-width: 100% !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
 }
 
 .post-entry:hover {

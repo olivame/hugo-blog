@@ -13,6 +13,14 @@ body {
   transition: all 0.25s ease;
 }
 
+/* === 让 PaperMod 标题自适应宽度 === */
+.post-title {
+    max-width: 100% !important;   /* 使用整个内容区宽度 */
+    word-break: normal;           /* 避免中文或英文被硬拆 */
+    overflow-wrap: break-word;    /* 只在必要时换行 */
+    line-height: 1.25;            /* 更好看（可选） */
+}
+
 .post-entry:hover {
   transform: translateY(-4px);
   box-shadow: 0 6px 20px rgba(0,0,0,0.08);

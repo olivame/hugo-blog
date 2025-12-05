@@ -1,0 +1,22 @@
+backend:
+  name: github
+  repo: olivame/hugo-blog
+  branch: main
+  auth_endpoint: https://decap-oauth.netlify.app/oauth/github
+
+media_folder: "static/uploads"
+public_folder: "/uploads"
+
+collections:
+  - name: posts
+    label: Posts
+    folder: content/posts
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Date", name: "date", widget: "datetime" }
+      - { label: "Draft", name: "draft", widget: "boolean", default: false }
+      - { label: "Tags", name: "tags", widget: "list" }
+      - { label: "Categories", name: "categories", widget: "list" }
+      - { label: "Body", name: "body", widget: "markdown" }

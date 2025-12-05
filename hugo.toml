@@ -1,4 +1,18 @@
-baseURL = 'https://blog.olivame.xyz'
-languageCode = 'en-us'
-title = 'My New Hugo Site'
+baseURL = "https://blog.olivame.xyz"
+languageCode = "en-us"
+title = "Yuzhi Deng's homepage"
 theme = "PaperMod"
+
+[outputs]
+home = ["HTML", "RSS", "JSON"]
+
+[params]
+disableSpecial1stPost = true
+ShowReadingTime = true
+ShowBreadCrumbs = true
+showPostNavLinks = true
+
+# 首页简介卡片
+#[params.homeInfoParams]
+#Title = "Hi，我是 Yuzhi Deng 👋"
+#Content = "欢迎来到我的个人主页。我喜欢 AI、技术研究和效率工具。"

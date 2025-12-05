@@ -1,0 +1,28 @@
+{{ define "main" }}
+
+<div style="text-align:center; margin-top: 40px; margin-bottom: 20px;">
+    <h1>Hi，我是 Yuzhi Deng 👋</h1>
+    <p style="font-size:18px; opacity:0.85;">
+        欢迎来到我的个人主页。我喜欢 AI、技术研究和效率工具。
+    </p>
+</div>
+
+<hr style="margin: 30px auto; width: 60%; opacity:0.3;">
+
+<section class="post-list" style="max-width: 800px; margin: 0 auto;">
+    {{ range .Site.RegularPages.ByDate.Reverse }}
+    <article class="post-entry" style="margin-bottom: 28px;">
+        <h2 style="margin-bottom: 6px;">
+            <a href="{{ .Permalink }}">{{ .Title }}</a>
+        </h2>
+        <time style="font-size:14px; opacity:0.6; display:block; margin-bottom:4px;">
+            {{ .Date.Format "January 2, 2006" }}
+        </time>
+        <p style="opacity:0.8; margin:0;">
+            {{ .Summary }}
+        </p>
+    </article>
+    {{ end }}
+</section>
+
+{{ end }}

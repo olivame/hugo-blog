@@ -1,0 +1,60 @@
+/* === 全局页面居中 & 优化 === */
+body {
+  background-color: #fafafa;
+  font-family: "Inter", "Roboto", "Noto Sans SC", sans-serif;
+}
+
+/* === 文章卡片美化 === */
+.post-entry {
+  border-radius: 14px;
+  padding: 1.2rem 1.4rem;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  transition: all 0.25s ease;
+}
+
+.post-entry:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  border-color: #d4d4d4;
+}
+
+/* === 标题加强 === */
+.post-entry .entry-header h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* === 文章摘要颜色柔化 === */
+.entry-content {
+  color: #666;
+}
+
+/* === 首页大标题（Hero Section）美化 === */
+.home-info {
+  background: linear-gradient(135deg, #4e85f5 0%, #7bb4ff 100%);
+  padding: 2rem;
+  border-radius: 16px;
+  color: white;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.home-info h1 {
+  font-size: 2rem !important;
+  margin-bottom: 0.3rem;
+}
+
+/* === 页脚轻量化 === */
+.footer {
+  color: #888;
+}
+
+/* === 链接样式优化 === */
+a {
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: #4e85f5;
+}

@@ -5,7 +5,6 @@ description: "使用 Webhook、Caddy 和 GitHub 搭建自动化部署 Hugo 博�
 tags: ["Hugo", "部署", "Caddy", "Webhook"]
 ---
 
-# Hugo 自动部署系统（Webhook + Caddy + GitHub）
 
 本文记录如何构建一个 **自动从 GitHub 拉取并重新部署 Hugo 博客** 的完整系统。
 

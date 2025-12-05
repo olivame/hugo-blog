@@ -19,7 +19,7 @@ body {
 
 /* 让标题区域更宽 */
 .single-title {
-    max-width: 1200px !important;     /* 标题最大宽度，自行调整 */
+    max-width: 1500px !important;     /* 标题最大宽度，自行调整 */
     width: 100%;
     margin-left: auto;
     margin-right: auto;

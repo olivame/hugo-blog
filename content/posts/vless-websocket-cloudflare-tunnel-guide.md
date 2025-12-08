@@ -1,5 +1,11 @@
-# VLESS + WebSocket + Cloudflare Tunnel 完整配置指南 
 
+---
+title: "VLESS + WebSocket + Cloudflare Tunnel 完整配置指南 "
+date: 2025-12-05T19:05:00+08:00
+---
+
+<!--more-->
+---
 > 本文为技术实践总结，所有示例中的域名、UUID、Tunnel ID 等敏感信息均已脱敏，仅作为配置参考使用。请务必替换为你自己的实际信息。
 
 ---
